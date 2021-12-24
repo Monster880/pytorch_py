@@ -27,13 +27,24 @@ for idx, name in enumerate(label_name):
 def default_loader(path):
     return Image.open(path).convert("RGB")
 
+# train_transform = transforms.Compose([
+#     transforms.RandomResizedCrop((28 , 28)),
+#     transforms.RandomHorizontalFlip(),
+#     transforms.RandomVerticalFlip(),
+#     transforms.RandomRotation(90),
+#     transforms.RandomGrayscale(0.1),
+#     transforms.ColorJitter(0.3, 0.3, 0.3, 0.3),
+#     transforms.ToTensor()
+# ])
+
 train_transform = transforms.Compose([
-    transforms.RandomResizedCrop((28 , 28)),
+    transforms.RandomCrop(28),
     transforms.RandomHorizontalFlip(),
-    transforms.RandomVerticalFlip(),
-    transforms.RandomRotation(90),
-    transforms.RandomGrayscale(0.1),
-    transforms.ColorJitter(0.3, 0.3, 0.3, 0.3),
+    transforms.ToTensor()
+])
+
+test_transform = transforms.Compose([
+    transforms.Resize((28 , 28)),
     transforms.ToTensor()
 ])
 
