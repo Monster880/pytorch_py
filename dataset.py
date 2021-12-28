@@ -1,26 +1,25 @@
-from torch.utils.data import Dataset,DataLoader
+from torch.utils.data import Dataset, DataLoader
 import jieba
 import numpy as np
 
 def read_dict(voc_dict_path):
     voc_dict = {}
-    dict_list = open(voc_dict_path,encoding='utf-8').readlines()
+    dict_list = open(voc_dict_path).readlines()
     for item in dict_list:
         item = item.split(",")
         voc_dict[item[0]] = int(item[1].strip())
     return voc_dict
 
-def load_data(data_path,data_stop_path):
-    data_list = open(data_path,encoding='utf-8').readlines()[1:]
-    stops_word = open(data_stop_path,encoding='utf-8').readlines()
+def load_data(data_path, data_stop_path):
+    data_list = open(data_path).readlines()[1:]
+    stops_word = open(data_stop_path).readlines()
     stops_word = [line.strip() for line in stops_word]
     stops_word.append(" ")
     stops_word.append("\n")
     voc_dict = {}
     data = []
-    max_len_seq = 0 #统计最长的句子长度
-    np.random.shuffle(data_list)
-    for item in data_list[:]:
+    max_len_seq = 0
+    for item in data_list[:100]:
         label = item[0]
         content = item[2:].strip()
         seg_list = jieba.cut(content, cut_all=False)
@@ -38,13 +37,12 @@ def load_data(data_path,data_stop_path):
         data.append([label, seg_res])
     return data, max_len_seq
 
-class text_ClS(Dataset):
-    def __init__(self, voc_dict_path,data_path,data_stop_path):
+class text_Cls(Dataset):
+    def __init__(self, voc_dict_path, data_path, data_stop_path):
         self.data_path = data_path
         self.data_stop_path = data_stop_path
         self.voc_dict = read_dict(voc_dict_path)
-        self.data, self.max_len_seq = \
-            load_data(self.data_path,self.data_stop_path)
+        self.data, self.max_len_seq = load_data(data_path, data_stop_path)
 
         np.random.shuffle(self.data)
 
@@ -61,22 +59,21 @@ class text_ClS(Dataset):
                 input_idx.append(self.voc_dict[word])
             else:
                 input_idx.append(self.voc_dict["<UNK>"])
-        if len(input_idx) < self.max_len_seq:#长度是否是和最大的句子的长度对齐
-            input_idx += [self.voc_dict["<PAD>"]
-                          for _ in range(self.max_len_seq - len(input_idx))]
+
+        if len(input_idx) < self.max_len_seq:
+            input_idx += [self.voc_dict["<PAD>"] for _ in range(self.max_len_seq - len(input_idx))]
+
         data = np.array(input_idx)
         return label, data
 
-def data_loader(dataset, config):
-    return DataLoader(dataset, batch_size=config.batch_size, shuffle=config.is_shuffle)
-    #data_path = "sources/weibo_senti_100k.csv"
-    #data_stop_path = "sources/hit_stopword"
-    #dict_path = "sources/dict"
+def data_loader(data_path, data_stop_path, dict_path):
+    dataset = text_Cls(dict_path, data_path, data_stop_path)
+    return DataLoader(dataset, batch_size=10, shuffle=True)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     data_path = "sources/weibo_senti_100k.csv"
-    data_stop_path = "sources/hit_stopword"
+    data_stop_path = "sources/hit_stopword.txt"
     dict_path = "sources/dict"
-    train_dataloader = data_loader(data_path,data_stop_path,dict_path)
+    train_dataloader = data_loader(data_path, data_stop_path, dict_path)
     for i, batch in enumerate(train_dataloader):
-        print(batch[1].size())
+        print(batch)
