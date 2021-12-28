@@ -11,3 +11,5 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 net = resnet()
 
 net.load_state_dict(torch.load())
+
+from mmdet.apis import init_detector, inference_detector
