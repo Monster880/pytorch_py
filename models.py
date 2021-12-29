@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-import cofigs
+from configs import Config
 
 class Model(nn.Module):
     def __init__(self,config):
@@ -30,8 +30,7 @@ class Model(nn.Module):
         return out
 
 if __name__ == '__main__':
-    cfg = cofigs.Config()
-    cfg.pad_size = 640
+    cfg = Config()
     model_textcls = Model(config=cfg)
     input_tensor = torch.tensor([i for i in range(640)]).reshape([1, 640])
     out_tensor = model_textcls.forward(input_tensor)

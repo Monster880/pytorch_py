@@ -2,18 +2,18 @@ import torch
 import torch.nn as nn
 from torch import optim
 from models import Model
-from datasets import data_loader, text_ClS
-import cofigs
+from dataset import data_loader, text_Cls
+import configs
 
-cfg = cofigs.Config()
+cfg = configs.Config()
 
 #读取数据
 data_path = "sources/weibo_senti_100k.csv"
-data_stop_path = "sources/hit_stopword"
+data_stop_path = "sources/hit_stopword.txt"
 dict_path = "sources/dict"
 
-dataset = text_ClS(dict_path, data_path, data_stop_path)
-train_dataloader = data_loader(dataset, cfg)
+dataset = text_Cls(dict_path, data_path, data_stop_path)
+train_dataloader = data_loader(data_path,data_stop_path, dict_path)
 
 cfg.pad_size = dataset.max_len_seq
 
